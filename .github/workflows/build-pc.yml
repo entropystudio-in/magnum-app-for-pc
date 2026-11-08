@@ -3198,11 +3198,17 @@ jobs:
 
       - name: Install
         working-directory: magnum-pc
-        run: npm install --no-audit --no-fund
+        shell: pwsh
+        run: |
+          for ($i=1; $i -le 5; $i++) { npm install --no-audit --no-fund; if ($LASTEXITCODE -eq 0) { break }; Write-Host "retry $i"; Start-Sleep -Seconds (20*$i) }
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Build the Windows installer
         working-directory: magnum-pc
-        run: npm run dist
+        shell: pwsh
+        run: |
+          for ($i=1; $i -le 5; $i++) { npm run dist; if ($LASTEXITCODE -eq 0) { break }; Write-Host "retry $i"; Start-Sleep -Seconds (20*$i) }
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: Publish as a release (direct .exe download, no zip)
         shell: pwsh
